@@ -3,15 +3,14 @@ package av3.compass.controller.form;
 
 import java.time.LocalDate;
 
-import javax.validation.constraints.Digits;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import org.hibernate.validator.constraints.Range;
-import org.springframework.format.annotation.DateTimeFormat;
+
 
 import av3.compass.annotations.ValidarIdade;
 import av3.compass.modelo.Estado;
@@ -33,7 +32,7 @@ public class EstadoForm {
 	@NotNull  @Min(0)@Max(value = Long.MAX_VALUE)
 	private long populacao;
 
-	@NotNull@NotEmpty @Pattern(regexp="^[A-Za-z ]*$",message = "Digite um nome válido (apenas letras)")
+	@NotNull@NotEmpty @Pattern(regexp="^[A-Za-z ]*$",message = "Digite uma capital válida (apenas letras)")
 	private String capital;
 
 	@NotNull  @Min(0)@Max(value = Long.MAX_VALUE)

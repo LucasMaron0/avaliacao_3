@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -40,6 +42,7 @@ public class EstadoController {
 
 
 	@GetMapping
+	@Cacheable(value = "listagemEstados")
 	public Page<EstadoDto> list(@RequestParam(required = false)String regiao,
 			@PageableDefault(sort="id", direction= Direction.ASC,page=0, size=10)Pageable paginacao) {
 
@@ -47,16 +50,52 @@ public class EstadoController {
 			Page<Estado> estado = estadoRepository.findAll(paginacao);
 			return EstadoDto.converter(estado);
 		} else {
+
 			String stringUp = regiao.toUpperCase();
 			Regiao regiaoEnum = Regiao.valueOf(stringUp);
 
 			Page<Estado> estado = estadoRepository.findByRegiao(regiaoEnum, paginacao);
-			return EstadoDto.converter(estado);
+			return EstadoDto.converter(estado);			
 		}
 	}
 	
+	@GetMapping("/{id}")
+	public ResponseEntity<EstadoDto> getById(@PathVariable Long id) {
+		Optional<Estado> estado = estadoRepository.findById(id);
+		if (estado.isPresent()) {
+			return ResponseEntity.ok(new EstadoDto(estado.get()));
+		}
+		return ResponseEntity.notFound().build();
+	}
+	
+	@GetMapping("/regiao-{regiao}")
+	public Page<EstadoDto> listPorRegiao(@PathVariable String regiao , 
+			@PageableDefault(sort="id", direction= Direction.ASC,page=0, size=10)Pageable paginacao)
+	{
+		String stringUp = regiao.toUpperCase();
+		Regiao regiaoEnum = Regiao.valueOf(stringUp);
+
+		Page<Estado> estado = estadoRepository.findByRegiao(regiaoEnum, paginacao);
+		return EstadoDto.converter(estado);				
+	}
+
+	@GetMapping("/area")
+	public Page<EstadoDto> listPorArea(@PageableDefault(sort="area", direction= Direction.DESC,page=0, size=10)Pageable paginacao) {
+		Page<Estado> estado = estadoRepository.findAll(paginacao);
+		return EstadoDto.converter(estado);		
+	}
+
+	@GetMapping("/populacao")
+	public Page<EstadoDto> listPorPopulacao(@PageableDefault(sort="populacao", direction= Direction.DESC,page=0, size=10)Pageable paginacao) {
+		Page<Estado> estado = estadoRepository.findAll(paginacao);
+		return EstadoDto.converter(estado);		
+	}
+
+
+
 	@PostMapping
 	@Transactional
+	@CacheEvict(value = "listagemEstados", allEntries = true)
 	public ResponseEntity<EstadoDto> cadastrar(@RequestBody @Valid EstadoForm form, UriComponentsBuilder uriBuilder) {
 		Estado estado = form.converter();
 		estadoRepository.save(estado);
@@ -65,38 +104,31 @@ public class EstadoController {
 		return ResponseEntity.created(uri).body(new EstadoDto(estado));
 	}
 
-	@GetMapping("/{id}")
-	public ResponseEntity<EstadoDto> listById(@PathVariable Long id) {
-		Optional<Estado> estado = estadoRepository.findById(id);
-		if (estado.isPresent()) {
-			return ResponseEntity.ok(new EstadoDto(estado.get()));
-		}
-		return ResponseEntity.notFound().build();
-	}
-	
 	@PutMapping("/{id}")
 	@Transactional
+	@CacheEvict(value = "listagemEstados", allEntries = true)
 	public ResponseEntity<EstadoDto> atualizar(@PathVariable Long id, @RequestBody @Valid EstadoForm form) {
 		Optional<Estado> optional = estadoRepository.findById(id);
 		if (optional.isPresent()) {
 			Estado estado = form.atualizar(id, estadoRepository);
 			return ResponseEntity.ok(new EstadoDto(estado));
 		}
-		
+
 		return ResponseEntity.notFound().build();
 	}
 
 
-	
+
 	@DeleteMapping("/{id}")
 	@Transactional
+	@CacheEvict(value = "listagemEstados", allEntries = true)
 	public ResponseEntity<?> remover(@PathVariable Long id) {
 		Optional<Estado> optional = estadoRepository.findById(id);
 		if (optional.isPresent()) {
 			estadoRepository.deleteById(id);
 			return ResponseEntity.ok().build();
 		}
-		
+
 		return ResponseEntity.notFound().build();
 	}
 

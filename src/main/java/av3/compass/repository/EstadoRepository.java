@@ -14,5 +14,8 @@ import av3.compass.modelo.Regiao;
 public interface EstadoRepository  extends JpaRepository<Estado, Long> {
 	
 	Page<Estado> findByRegiao(@RequestParam("regiao") Regiao regiao, Pageable paginacao);
+	
+	
+	
 		
 }

@@ -1,3 +1,6 @@
+INSERT INTO USER (email, senha) values ('admin','$2a$10$b7M3VbSYDkiwkV5A9hxWTOqC.p8N6s0X.NLAPgs0dhr4DY8EYd/nq');
+
+
 INSERT INTO Estado(nome, regiao, populacao, capital,area,fundacao,idade) VALUES('RS','SUL',1,'capital1', 10,'2020-1-1',2);
 INSERT INTO Estado(nome, regiao, populacao, capital,area,fundacao,idade) VALUES('SC','SUL',2,'capital2', 9,'2020-1-1',2);
 INSERT INTO Estado(nome, regiao, populacao, capital,area,fundacao,idade) VALUES('SP','SUDESTE',3,'capital3', 8,'2020-1-1',2);
